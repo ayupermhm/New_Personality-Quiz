@@ -1,7 +1,7 @@
 import os
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import pandas as pd
 import streamlit as st
@@ -9,13 +9,13 @@ import streamlit as st
 # ---------- Optional Supabase client ----------
 def get_supabase():
     try:
-        from supabase import create_client, Client  # pip install supabase
+        from supabase import create_client  # pip install supabase
     except Exception:
         return None
     if "supabase" not in st.secrets:
         return None
     url = st.secrets["supabase"].get("url")
-    key = st.secrets["supabase"].get("key")  # Use the service role key on Streamlit Cloud
+    key = st.secrets["supabase"].get("key")  # Use Service Role key in Streamlit Secrets
     if not url or not key:
         return None
     try:
@@ -25,15 +25,15 @@ def get_supabase():
 
 SUPABASE = get_supabase()
 
-# ---------- Paths (for local dev fallback only) ----------
+# ---------- Paths (CSV fallback for local/dev) ----------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.environ.get("QUIZ_DATA_DIR", os.path.join(BASE_DIR, "data"))
 if not SUPABASE:
     os.makedirs(DATA_DIR, exist_ok=True)
-RESPONSES_CSV = os.path.join(DATA_DIR, "responses.csv")   # fallback only
-SUMMARIES_CSV = os.path.join(DATA_DIR, "summaries.csv")   # fallback only
 
 QUESTIONS_CSV = os.path.join(BASE_DIR, "questions.csv")
+RESPONSES_CSV = os.path.join(DATA_DIR, "responses.csv")   # fallback only
+SUMMARIES_CSV = os.path.join(DATA_DIR, "summaries.csv")   # fallback only
 
 # ---------- Load questions ----------
 @st.cache_data
@@ -49,7 +49,6 @@ def load_questions(csv_path: str) -> List[Dict]:
     missing = required - set(df.columns)
     if missing:
         raise RuntimeError(f"CSV missing required columns: {sorted(missing)}")
-
     df["weight"] = df["weight"].astype(float)
     bad = df[(df["weight"] < 0) | (df["weight"] > 1)]
     if not bad.empty:
@@ -121,16 +120,14 @@ def persist_submission(student_name: str, per_q: List[Dict],
     }
 
     if SUPABASE:
-        # Insert into tables: 'responses' (many rows), 'summaries' (one row)
         try:
             SUPABASE.table("responses").insert(detail_rows).execute()
             SUPABASE.table("summaries").insert(summary_row).execute()
             return submission_id
         except Exception as e:
-            # Soft-fallback to CSV (dev-friendly) if Supabase insert fails
             st.warning(f"Supabase insert failed, falling back to CSV: {e}")
 
-    # Fallback: local CSV (OK for local dev; ephemeral on Streamlit Cloud)
+    # Fallback: local CSV (OK locally; ephemeral on Streamlit Cloud)
     pd.DataFrame(detail_rows).to_csv(
         RESPONSES_CSV, mode="a", index=False, header=not os.path.exists(RESPONSES_CSV)
     )
@@ -143,23 +140,51 @@ def persist_submission(student_name: str, per_q: List[Dict],
 st.set_page_config(page_title="Personality Quiz", page_icon="📝", layout="centered")
 st.title("Personality Quiz")
 
+# ---- Session-state helpers (must be before widgets) ----
+if "reset_after_submit" not in st.session_state:
+    st.session_state.reset_after_submit = False
+if "last_submission_id" not in st.session_state:
+    st.session_state.last_submission_id = None
+
+# Load questions
 try:
     questions = load_questions(QUESTIONS_CSV)
 except Exception as e:
     st.error(f"Failed to load questions: {e}")
     st.stop()
 
+# If previous run requested a reset, clear BEFORE creating widgets
+if st.session_state.reset_after_submit:
+    st.session_state.reset_after_submit = False
+    st.session_state["student_name"] = ""
+    for q in questions:
+        st.session_state.pop(f"q_{q['id']}", None)
+
+# If we have a success message from previous run, show it now (once)
+if st.session_state.last_submission_id:
+    st.success(f"Submitted! ID: {st.session_state.last_submission_id}")
+    st.session_state.last_submission_id = None
+
+# Name input
 name = st.text_input("Student Name", key="student_name", placeholder="e.g. Ayu Permata")
 
+# Questions (radio buttons)
 answers: Dict[str, str] = {}
 for q in questions:
     st.markdown(f"**{q['id']}. {q['text']}**")
     key = f"q_{q['id']}"
     options = [f"{c['label']}. {c['text']}" for c in q["choices"]]
-    selected = st.radio("", options=options, index=None, key=key, label_visibility="collapsed")
+    selected = st.radio(
+        label="",
+        options=options,
+        index=None,
+        key=key,
+        label_visibility="collapsed",
+    )
     if selected:
         answers[q["id"]] = selected.split(".")[0]  # "A. ..." -> "A"
 
+# Submit button
 submitted = st.button("Submit", type="primary", use_container_width=True)
 
 if submitted:
@@ -176,12 +201,9 @@ if submitted:
         per_q, total, max_total, normalized = compute_scores(questions, answers)
         submission_id = persist_submission(name.strip(), per_q, total, max_total, normalized)
 
-        st.success(f"Submitted! ID: {submission_id}")
-
-        # Reset UI: clear name + answers
-        st.session_state["student_name"] = ""
-        for q in questions:
-            st.session_state.pop(f"q_{q['id']}", None)
+        # Defer reset to next run (avoid modifying widget state after instantiation)
+        st.session_state.last_submission_id = submission_id
+        st.session_state.reset_after_submit = True
         st.rerun()
 
     except Exception as e:
