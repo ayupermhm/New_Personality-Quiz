@@ -1,0 +1,41 @@
+question_id,question_text,choice_label,choice_text,weight
+q01,"If you could spend a week shadowing someone, who would you choose?",A,"A professional in a field I already know, to deepen my expertise and gain insider insights.",0.25
+q01,"If you could spend a week shadowing someone, who would you choose?",B,"Someone in a completely different field, to broaden my perspective and spark new ideas.",0.75
+q01,"If you could spend a week shadowing someone, who would you choose?",C,"A person from a different country and culture, to experience fresh ways of thinking and working.",1.0
+q01,"If you could spend a week shadowing someone, who would you choose?",D,"An inspiring leader or innovator, to learn firsthand how they tackle challenges and drive impact.",1.0
+q02,"If you’re in a team where everyone has different opinions, what’s your approach?",A,"I focus on doing my part well and supporting the team, even if I don’t fully agree with every decision.",0.25
+q02,"If you’re in a team where everyone has different opinions, what’s your approach?",B,"I look for common ground and help the team find a balanced compromise that works for most.",0.75
+q02,"If you’re in a team where everyone has different opinions, what’s your approach?",C,"I encourage open discussion and healthy debate so we can identify the strongest solution together.",0.75
+q02,"If you’re in a team where everyone has different opinions, what’s your approach?",D,"I step up to guide the conversation, helping the team make a clear decision and move forward.",1.0
+q03,"If you had the chance to start a club or movement in your uni, what would you do?",A,"I’d join an existing club where I can contribute and learn from others who already share my interests.",0.25
+q03,"If you had the chance to start a club or movement in your uni, what would you do?",B,"I’d create one based on my own passion, and work on inspiring others to join me.",1.0
+q03,"If you had the chance to start a club or movement in your uni, what would you do?",C,"I’d join a club backed by strong networks or industry connections, to gain exposure and further my career.",0.5
+q03,"If you had the chance to start a club or movement in your uni, what would you do?",D,"I’d join a club that my friends are part of, because I value growing and building experiences together.",0.25
+q04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",A,"I’d quickly assess the tasks, prioritize by importance, and start executing or delegating right away.",0.75
+q04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",B,"I’d dive straight into one task—often the simplest—to create momentum and deliver quick wins, then use that energy to tackle the others.",1.0
+q04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",C,"I’d clarify expectations with my manager to make sure I’m tackling the tasks in the right order and direction.",0.75
+q04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",D,"I’d take a moment to process and might feel stuck at first, but once I break the work into smaller steps, I can move forward.",0.25
+q05,"If you see a problem that no one has addressed, you:",A,"Step in and fix it right away without waiting — I believe action matters most.",1.0
+q05,"If you see a problem that no one has addressed, you:",B,"Raise the issue through the proper channels and propose a solution once it’s reviewed and approved.",0.75
+q05,"If you see a problem that no one has addressed, you:",C,"Point it out so the team is aware, but leave the action to others who are responsible.",0.5
+q05,"If you see a problem that no one has addressed, you:",D,"Note it but move on, since it’s outside my role and others may be better suited to handle it.",0.25
+q06,"If you see a problem that no one has addressed, you:",A,"Step in and fix it right away without waiting — I believe action matters most.",1.0
+q06,"If you see a problem that no one has addressed, you:",B,"Share the idea and propose a solution, making sure the right people are aligned before moving forward, even if this may take a long time.",0.75
+q06,"If you see a problem that no one has addressed, you:",C,"Point it out so the team is aware, but leave the action to others who are responsible.",0.5
+q06,"If you see a problem that no one has addressed, you:",D,"Note it but move on, since it’s outside my role and others may be better suited to handle it.",0.25
+q07,"How do you usually handle learning a new skill for work?",A,"I like to research and try teaching myself first, then reach out for help if I get stuck.",1.0
+q07,"How do you usually handle learning a new skill for work?",B,"I prefer asking for structured training materials or resources to guide my learning.",0.75
+q07,"How do you usually handle learning a new skill for work?",C,"I wait for someone to explain it so I can learn directly from their experience.",0.5
+q07,"How do you usually handle learning a new skill for work?",D,"I focus on other priorities first and pick it up when it becomes necessary for the job.",0.25
+q08,"During a team project, what role do you naturally take?",A,"I work best independently and contribute strongly on my own, even if I’m less involved in team discussions.",0.25
+q08,"During a team project, what role do you naturally take?",B,"I’m a focused contributor who prefers clearly defined tasks, so I can deliver high-quality results on my part.",0.5
+q08,"During a team project, what role do you naturally take?",C,"I’m a supportive collaborator who keeps things on track and ensures the team makes steady progress.",0.75
+q08,"During a team project, what role do you naturally take?",D,"I’m flexible — I can step up as a leader or play a supporting role, depending on what the team needs most.",1.0
+q09,"How do you feel about doing tasks outside your JD?",A,"Pulls me away from my focus — I’d rather deepen expertise in my own role, but I’m willing to help outside of it when necessary.",0.25
+q09,"How do you feel about doing tasks outside your JD?",B,"Motivated — it keeps me learning, growing, and staying adaptable.",0.75
+q09,"How do you feel about doing tasks outside your JD?",C,"Neutral — I’m comfortable stepping in when needed, though I generally prefer a more structured role.",0.5
+q09,"How do you feel about doing tasks outside your JD?",D,"Excited — I enjoy the variety and see it as a chance to take on new challenges.",1.0
+q10,"If you had the choice, where would you prefer to spend your internship?",A,"In a state-of-the-art office in the city centre, surrounded by a vibrant professional atmosphere.",0.5
+q10,"If you had the choice, where would you prefer to spend your internship?",B,"Working remotely or from home, with the flexibility to manage my own time and space.",0.5
+q10,"If you had the choice, where would you prefer to spend your internship?",C,"On the ground, working hands-on with different stakeholders across varied environments.",0.75
+q10,"If you had the choice, where would you prefer to spend your internship?",D,"Anywhere — as long as I can make meaningful contributions while continuing to learn, grow, and be challenged.",1.0
