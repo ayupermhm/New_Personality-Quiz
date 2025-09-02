@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Personality Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .choices { margin-top: 8px; }
+    .row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+    button { padding: 10px 16px; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
+    .ok { color: #0a0; }
+    .err { color: #a00; }
+    .muted { color: #666; }
+    .disabled { opacity: 0.6; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <h1>Personality Quiz</h1>
+
+  <div class="card">
+    <label for="studentName"><strong>Student Name</strong></label><br />
+    <input id="studentName" type="text" style="width:320px; padding:8px; border-radius:8px; border:1px solid #ccc;" placeholder="e.g. Ayu Permata" />
+  </div>
+
+  <div id="quiz"></div>
+
+  <button id="submitBtn">Submit</button>
+
+  <div id="result" style="margin-top:16px;"></div>
+
+  <script>
+    const quizEl = document.getElementById('quiz');
+    const resultEl = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Keep a copy of questions so we can re-render (fresh/unselected) after submit
+    let QUESTIONS = [];
+
+    async function loadQuiz() {
+      const res = await fetch('/quiz');
+      if (!res.ok) {
+        quizEl.innerHTML = `<p class="err">Failed to load quiz: ${res.status}</p>`;
+        return;
+      }
+      QUESTIONS = await res.json();
+      renderQuiz(QUESTIONS);
+    }
+
+    function renderQuiz(questions) {
+      quizEl.innerHTML = '';
+      questions.forEach(q => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const title = document.createElement('div');
+        title.innerHTML = `<strong>${q.id}.</strong> ${q.text}`;
+        card.appendChild(title);
+
+        const choices = document.createElement('div');
+        choices.className = 'choices';
+        q.choices.forEach(c => {
+          const row = document.createElement('label');
+          row.className = 'row';
+          row.innerHTML = `
+            <input type="radio" name="${q.id}" value="${c.label}" />
+            <span><strong>${c.label}.</strong> ${c.text}</span>
+          `;
+          choices.appendChild(row);
+        });
+        card.appendChild(choices);
+        quizEl.appendChild(card);
+      });
+    }
+
+    function collectAnswers() {
+      const inputs = quizEl.querySelectorAll('input[type=radio]');
+      const byQuestion = {};
+      inputs.forEach(inp => {
+        if (inp.checked) byQuestion[inp.name] = inp.value;
+      });
+      return byQuestion;
+    }
+
+    function clearSelections() {
+      // Re-render the quiz so all radios are fresh/unselected
+        renderQuiz(QUESTIONS);
+      // If you also want to clear the student's name, uncomment next line:
+      // document.getElementById('studentName').value = '';
+
+        // 🔄 Also clear the student's name and focus the field
+        const nameInput = document.getElementById('studentName');
+        nameInput.value = '';
+        nameInput.focus();
+    }
+
+    function setSubmitting(isSubmitting) {
+      submitBtn.classList.toggle('disabled', isSubmitting);
+      submitBtn.disabled = isSubmitting;
+      Array.from(quizEl.querySelectorAll('input,button')).forEach(el => el.disabled = isSubmitting);
+      document.getElementById('studentName').disabled = isSubmitting;
+    }
+
+    submitBtn.addEventListener('click', async () => {
+      resultEl.textContent = '';
+      const name = document.getElementById('studentName').value.trim();
+      if (!name) {
+        resultEl.innerHTML = `<p class="err">Please enter your name.</p>`;
+        return;
+      }
+
+      const selected = collectAnswers();
+      const cards = quizEl.querySelectorAll('.card');
+      const ids = Array.from(cards).map(c => c.querySelector('strong').textContent.replace('.', '').trim());
+      const missing = ids.filter(qid => !(qid in selected));
+      if (missing.length) {
+        resultEl.innerHTML = `<p class="err">Please answer all questions. Missing: ${missing.join(', ')}</p>`;
+        return;
+      }
+
+      const payload = {
+        student_name: name,
+        answers: Object.entries(selected).map(([question_id, choice_label]) => ({ question_id, choice_label }))
+      };
+
+      try {
+        setSubmitting(true);
+        const res = await fetch('/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const msg = await res.text();
+          throw new Error(msg || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+
+        // Show only "Submitted!" and the submission id
+        resultEl.innerHTML = `
+          <p class="ok"><strong>Submitted!</strong> <span class="muted">ID: <code>${data.submission_id}</code></span></p>
+        `;
+
+        // 🔄 Clear answers from the UI
+        clearSelections();
+      } catch (e) {
+        resultEl.innerHTML = `<p class="err">Submit failed: ${e}</p>`;
+      } finally {
+        setSubmitting(false);
+      }
+    });
+
+    loadQuiz();
+  </script>
+</body>
+</html>

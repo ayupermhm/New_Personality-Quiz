@@ -1,0 +1,4 @@
+timestamp,submission_id,student_name,total_score,max_total,normalized
+
+2025-09-02T02:06:52Z,73066997-8068-4362-95bd-b29aa7ace6b6,hi!,7.5,10.0,0.75
+2025-09-02T02:15:30Z,48ef262c-58dc-4412-8965-0e44989eae24,hi!,6.25,10.0,0.625
