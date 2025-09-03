@@ -6,18 +6,23 @@ from typing import Dict, List
 import pandas as pd
 import streamlit as st
 
-# ---------- Optional Supabase client ----------
+# =========================
+# Supabase client (server-side)
+# =========================
 def get_supabase():
+    """Create a Supabase client from Streamlit secrets, or return None if not configured."""
     try:
-        from supabase import create_client  # pip install supabase
+        from supabase import create_client
     except Exception:
+        # Library missing (e.g., local dev without supabase installed)
         return None
-    if "supabase" not in st.secrets:
-        return None
-    url = st.secrets["supabase"].get("url")
-    key = st.secrets["supabase"].get("key")  # Use Service Role key in Streamlit Secrets
+
+    sup = st.secrets.get("supabase", {})
+    url = sup.get("url")
+    key = sup.get("key")  # Use the SERVICE ROLE key in Streamlit Secrets
     if not url or not key:
         return None
+
     try:
         return create_client(url, key)
     except Exception:
@@ -25,7 +30,9 @@ def get_supabase():
 
 SUPABASE = get_supabase()
 
-# ---------- Paths (CSV fallback for local/dev) ----------
+# =========================
+# Paths (CSV fallback for local/dev)
+# =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.environ.get("QUIZ_DATA_DIR", os.path.join(BASE_DIR, "data"))
 if not SUPABASE:
@@ -35,13 +42,24 @@ QUESTIONS_CSV = os.path.join(BASE_DIR, "questions.csv")
 RESPONSES_CSV = os.path.join(DATA_DIR, "responses.csv")   # fallback only
 SUMMARIES_CSV = os.path.join(DATA_DIR, "summaries.csv")   # fallback only
 
-# ---------- Load questions ----------
+# =========================
+# Load questions from CSV
+# =========================
 @st.cache_data
 def load_questions(csv_path: str) -> List[Dict]:
+    """
+    CSV schema: question_id, question_text, choice_label, choice_text, weight
+    - question_id should be strings like "01", "02", ...
+    - weight is 0..1
+    """
     df = pd.read_csv(
         csv_path,
-        dtype={"question_id": "string", "question_text": "string",
-               "choice_label": "string", "choice_text": "string"},
+        dtype={
+            "question_id": "string",
+            "question_text": "string",
+            "choice_label": "string",
+            "choice_text": "string",
+        },
         keep_default_na=False,
     )
     df.columns = [c.lower() for c in df.columns]
@@ -49,6 +67,7 @@ def load_questions(csv_path: str) -> List[Dict]:
     missing = required - set(df.columns)
     if missing:
         raise RuntimeError(f"CSV missing required columns: {sorted(missing)}")
+
     df["weight"] = df["weight"].astype(float)
     bad = df[(df["weight"] < 0) | (df["weight"] > 1)]
     if not bad.empty:
@@ -60,17 +79,27 @@ def load_questions(csv_path: str) -> List[Dict]:
             "id": str(qid),
             "text": str(g["question_text"].iloc[0]),
             "choices": [
-                {"label": str(r["choice_label"]).strip(),
-                 "text": str(r["choice_text"]).strip(),
-                 "weight": float(r["weight"])}
+                {
+                    "label": str(r["choice_label"]).strip(),
+                    "text": str(r["choice_text"]).strip(),
+                    "weight": float(r["weight"]),
+                }
                 for _, r in g.iterrows()
             ],
         }
+        # Sort choices by label (A/B/C/D)
         q["choices"].sort(key=lambda c: c["label"])
         questions.append(q)
     return questions
 
+# =========================
+# Scoring
+# =========================
 def compute_scores(questions: List[Dict], answers: Dict[str, str]):
+    """
+    answers: {"01": "A", ...}
+    returns (per_q list, total, max_total, normalized)
+    """
     per_question = []
     for q in questions:
         chosen = answers.get(q["id"])
@@ -91,9 +120,11 @@ def compute_scores(questions: List[Dict], answers: Dict[str, str]):
     normalized = total / max_total if max_total > 0 else 0.0
     return per_question, total, max_total, normalized
 
+# =========================
+# Persistence (Supabase first, CSV fallback)
+# =========================
 def persist_submission(student_name: str, per_q: List[Dict],
                        total: float, max_total: float, normalized: float) -> str:
-    """Writes to Supabase if configured; else appends to local CSVs."""
     submission_id = str(uuid.uuid4())
     ts = datetime.utcnow().isoformat(timespec="seconds") + "Z"
 
@@ -119,15 +150,17 @@ def persist_submission(student_name: str, per_q: List[Dict],
         "normalized": normalized,
     }
 
+    # Supabase insert (preferred for Streamlit Cloud)
     if SUPABASE:
         try:
             SUPABASE.table("responses").insert(detail_rows).execute()
             SUPABASE.table("summaries").insert(summary_row).execute()
             return submission_id
         except Exception as e:
+            # Fall back to CSV in case of transient errors or misconfig
             st.warning(f"Supabase insert failed, falling back to CSV: {e}")
 
-    # Fallback: local CSV (OK locally; ephemeral on Streamlit Cloud)
+    # CSV fallback (local dev; ephemeral on Streamlit Cloud)
     pd.DataFrame(detail_rows).to_csv(
         RESPONSES_CSV, mode="a", index=False, header=not os.path.exists(RESPONSES_CSV)
     )
@@ -136,11 +169,26 @@ def persist_submission(student_name: str, per_q: List[Dict],
     )
     return submission_id
 
-# ---------- UI ----------
-st.set_page_config(page_title="Personality Quiz", page_icon="📝", layout="centered")
-st.title("Personality Quiz")
+# =========================
+# UI
+# =========================
+st.set_page_config(page_title="Personality Quiz for DTIP", page_icon="📝", layout="centered")
+st.title("Personality Quiz for DTIP")
 
-# ---- Session-state helpers (must be before widgets) ----
+# Formal instructions (top section)
+st.markdown(
+    """
+**Instructions**
+
+- Enter your full name as you would like it recorded.
+- Read each statement carefully and select the single option that best reflects your typical preference or behaviour.
+- Answer truthfully. There are no right or wrong answers.
+- All questions are mandatory; one selection per question is required before submitting.
+- After submission, you will receive a confirmation ID for reference.
+"""
+)
+
+# Session-state flags for safe reset-after-submit (avoid widget mutation errors)
 if "reset_after_submit" not in st.session_state:
     st.session_state.reset_after_submit = False
 if "last_submission_id" not in st.session_state:
@@ -160,13 +208,8 @@ if st.session_state.reset_after_submit:
     for q in questions:
         st.session_state.pop(f"q_{q['id']}", None)
 
-# If we have a success message from previous run, show it now (once)
-if st.session_state.last_submission_id:
-    st.success(f"Submitted! ID: {st.session_state.last_submission_id}")
-    st.session_state.last_submission_id = None
-
 # Name input
-name = st.text_input("Student Name", key="student_name", placeholder="e.g. Ayu Permata")
+name = st.text_input("Full Name", key="student_name", placeholder="e.g. John Tan")
 
 # Questions (radio buttons)
 answers: Dict[str, str] = {}
@@ -190,7 +233,7 @@ submitted = st.button("Submit", type="primary", use_container_width=True)
 if submitted:
     try:
         if not name.strip():
-            st.error("Please enter your name.")
+            st.error("Please enter your full name.")
             st.stop()
 
         missing = [q["id"] for q in questions if q["id"] not in answers]
@@ -201,10 +244,34 @@ if submitted:
         per_q, total, max_total, normalized = compute_scores(questions, answers)
         submission_id = persist_submission(name.strip(), per_q, total, max_total, normalized)
 
-        # Defer reset to next run (avoid modifying widget state after instantiation)
+        # Defer reset to the next run; show confirmation at the very bottom
         st.session_state.last_submission_id = submission_id
         st.session_state.reset_after_submit = True
         st.rerun()
 
     except Exception as e:
         st.error(f"Submit failed: {e}")
+
+# -----------------------------------
+# Bottom-of-page confirmation (only)
+# -----------------------------------
+if st.session_state.last_submission_id:
+    st.markdown("---")
+    st.success(f"Submitted. Confirmation ID: `{st.session_state.last_submission_id}`")
+    # Clear the flag so it only shows once per submission
+    st.session_state.last_submission_id = None
+
+# (Optional) tiny debug (collapsed); uncomment while troubleshooting
+# with st.expander("🔧 Supabase Debug", expanded=False):
+#     try:
+#         import supabase as _sb
+#         st.write("supabase lib:", getattr(_sb, "__version__", "not found"))
+#     except Exception as e:
+#         st.write("supabase import error:", e)
+#     st.write("client configured:", bool(SUPABASE))
+#     if SUPABASE:
+#         try:
+#             test = SUPABASE.table("summaries").select("*", count="exact").limit(1).execute()
+#             st.write("select OK, rows:", len(test.data or []))
+#         except Exception as e:
+#             st.write("select failed:", e)
