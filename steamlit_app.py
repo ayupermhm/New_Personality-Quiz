@@ -208,7 +208,8 @@ if submitted:
 
     except Exception as e:
         st.error(f"Submit failed: {e}")
-
+        
+'''
 # ===== DEBUG (remove later) =====
 with st.expander("🔧 Supabase Debug", expanded=False):
     st.write("Client configured:", bool(SUPABASE))
@@ -240,3 +241,4 @@ with st.expander("🔧 Supabase Debug", expanded=True):
             st.write("Select OK. rows:", len(test.data or []), "count:", getattr(test, "count", None))
         except Exception as e:
             st.error(f"Select failed: {e}")
+'''
