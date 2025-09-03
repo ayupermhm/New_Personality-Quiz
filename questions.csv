@@ -10,7 +10,7 @@ question_id,question_text,choice_label,choice_text,weight
 03,"If you had the chance to start a club or movement in your uni, what would you do?",A,"I’d join an existing club where I can contribute and learn from others who already share my interests.",0.25
 03,"If you had the chance to start a club or movement in your uni, what would you do?",B,"I’d create one based on my own passion, and work on inspiring others to join me.",1.0
 03,"If you had the chance to start a club or movement in your uni, what would you do?",C,"I’d join a club backed by strong networks or industry connections, to gain exposure and further my career.",0.5
-03,"If you had the chance to start a club or movement in your uni, what would you do?",D,"I’d join a club that my friends are part of, because I value growing and building experiences together.",0.25
+03,"If you had the chance to start a club or movement in your uni, what would you do?",D,"I’d join a club I’m passionate about and be inspired to take it to new horizons.",1.0
 04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",A,"I’d quickly assess the tasks, prioritize by importance, and start executing or delegating right away.",0.75
 04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",B,"I’d dive straight into one task—often the simplest—to create momentum and deliver quick wins, then use that energy to tackle the others.",1.0
 04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",C,"I’d clarify expectations with my manager to make sure I’m tackling the tasks in the right order and direction.",0.75
