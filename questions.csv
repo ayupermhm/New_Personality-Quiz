@@ -19,10 +19,10 @@ question_id,question_text,choice_label,choice_text,weight
 05,"If you see a problem that no one has addressed, you:",B,"Raise the issue through the proper channels and propose a solution once it’s reviewed and approved.",0.75
 05,"If you see a problem that no one has addressed, you:",C,"Point it out so the team is aware, but leave the action to others who are responsible.",0.5
 05,"If you see a problem that no one has addressed, you:",D,"Note it but move on, since it’s outside my role and others may be better suited to handle it.",0.25
-06,"If you see a problem that no one has addressed, you:",A,"Step in and fix it right away without waiting — I believe action matters most.",1.0
-06,"If you see a problem that no one has addressed, you:",B,"Share the idea and propose a solution, making sure the right people are aligned before moving forward, even if this may take a long time.",0.75
-06,"If you see a problem that no one has addressed, you:",C,"Point it out so the team is aware, but leave the action to others who are responsible.",0.5
-06,"If you see a problem that no one has addressed, you:",D,"Note it but move on, since it’s outside my role and others may be better suited to handle it.",0.25
+06,"You’re handed a brand-new project with no standard operating procedure (SOP). How do you feel?",A,"Excited — I enjoy creating something new and exploring uncharted territory.",1.0
+06,"You’re handed a brand-new project with no standard operating procedure (SOP). How do you feel?",B,"Energized — I’ll design my own process, set clear steps, and start building structure from day one.",0.75
+06,"You’re handed a brand-new project with no standard operating procedure (SOP). How do you feel?",C,"Engaged — I’d involve teammates or stakeholders early, test ideas together, and shape the approach as we go.",1.0
+06,"You’re handed a brand-new project with no standard operating procedure (SOP). How do you feel?",D,"Hesitant — I’d prefer not to take it on until there’s more groundwork or clarity in place.",0.25
 07,"How do you usually handle learning a new skill for work?",A,"I like to research and try teaching myself first, then reach out for help if I get stuck.",1.0
 07,"How do you usually handle learning a new skill for work?",B,"I prefer asking for structured training materials or resources to guide my learning.",0.75
 07,"How do you usually handle learning a new skill for work?",C,"I wait for someone to explain it so I can learn directly from their experience.",0.5

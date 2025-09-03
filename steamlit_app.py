@@ -208,37 +208,3 @@ if submitted:
 
     except Exception as e:
         st.error(f"Submit failed: {e}")
-        
-'''
-# ===== DEBUG (remove later) =====
-with st.expander("🔧 Supabase Debug", expanded=False):
-    st.write("Client configured:", bool(SUPABASE))
-    if SUPABASE:
-        try:
-            test = SUPABASE.table("summaries").select("*", count="exact").limit(1).execute()
-            st.write("Select OK. rows:", len(test.data or []), "count:", getattr(test, "count", None))
-        except Exception as e:
-            st.error(f"Select failed: {e}")
-
-with st.expander("🔧 Supabase Debug", expanded=True):
-    # Library present?
-    try:
-        import supabase as _sb
-        st.write("supabase lib:", getattr(_sb, "__version__", "not found"))
-    except Exception as e:
-        st.error(f"Import error: {e}")
-
-    # Secrets present? (just booleans, no values)
-    st.write("secrets has 'supabase':", "supabase" in st.secrets)
-    if "supabase" in st.secrets:
-        st.write("has url:", bool(st.secrets["supabase"].get("url")))
-        st.write("has key:", bool(st.secrets["supabase"].get("key")))
-
-    st.write("Client configured:", bool(SUPABASE))
-    if SUPABASE:
-        try:
-            test = SUPABASE.table("summaries").select("*", count="exact").limit(1).execute()
-            st.write("Select OK. rows:", len(test.data or []), "count:", getattr(test, "count", None))
-        except Exception as e:
-            st.error(f"Select failed: {e}")
-'''
