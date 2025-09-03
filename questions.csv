@@ -15,7 +15,7 @@ question_id,question_text,choice_label,choice_text,weight
 04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",B,"I’d dive straight into one task—often the simplest—to create momentum and deliver quick wins, then use that energy to tackle the others.",1.0
 04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",C,"I’d clarify expectations with my manager to make sure I’m tackling the tasks in the right order and direction.",0.75
 04,"Imagine your manager assigns you three urgent tasks at once. What’s your approach?",D,"I’d take a moment to process and might feel stuck at first, but once I break the work into smaller steps, I can move forward.",0.25
-05,"If you see a problem that no one has addressed, you:",A,"Step in and fix it right away without waiting — I believe action matters most.",1.0
+05,"If you see a problem that no one has addressed, you:",A,"Step in and fix it right away without waiting — and make sure to communicate the solution to the team so everyone stays aligned.",1.0
 05,"If you see a problem that no one has addressed, you:",B,"Raise the issue through the proper channels and propose a solution once it’s reviewed and approved.",0.75
 05,"If you see a problem that no one has addressed, you:",C,"Point it out so the team is aware, but leave the action to others who are responsible.",0.5
 05,"If you see a problem that no one has addressed, you:",D,"Note it but move on, since it’s outside my role and others may be better suited to handle it.",0.25
@@ -36,6 +36,6 @@ question_id,question_text,choice_label,choice_text,weight
 09,"How do you feel about doing tasks outside your JD?",C,"Neutral — I’m comfortable stepping in when needed, though I generally prefer a more structured role.",0.5
 09,"How do you feel about doing tasks outside your JD?",D,"Excited — I enjoy the variety and see it as a chance to take on new challenges.",1.0
 10,"If you had the choice, where would you prefer to spend your internship?",A,"In a state-of-the-art office in the city centre, surrounded by a vibrant professional atmosphere.",0.5
-10,"If you had the choice, where would you prefer to spend your internship?",B,"Working remotely or from home, with the flexibility to manage my own time and space.",0.5
+10,"If you had the choice, where would you prefer to spend your internship?",B,"Working remotely or from home, with the flexibility to manage my own time and space.",0.0
 10,"If you had the choice, where would you prefer to spend your internship?",C,"On the ground, working hands-on with different stakeholders across varied environments.",0.75
 10,"If you had the choice, where would you prefer to spend your internship?",D,"Anywhere — as long as I can make meaningful contributions while continuing to learn, grow, and be challenged.",1.0
